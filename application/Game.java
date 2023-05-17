@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import javafx.scene.shape.Polyline;
 
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
@@ -23,7 +24,8 @@ public class Game extends Pane {
 	
 	// !!! Vehicle and Path
 	private Vehicle vehicle = new Vehicle("1", "5");
-	private Path path;
+	private Path pathClass;
+	private Polyline path;
 	
 	
 		// This is constructor for Level that will be invoked in Main class
@@ -99,16 +101,26 @@ public class Game extends Pane {
 			ImageView image = city.getImage();
 			image.setFitHeight(CELL_SIZE);
 			image.setFitWidth(CELL_SIZE);
-			
 			// Name of the city
 			Label label = new Label(city.getCityName(), image);
 			label.setTextFill(Color.BLACK);
 			label.setContentDisplay(ContentDisplay.TOP);
-			
+			if(true)
+			{	
+				label.setOnMouseClicked(e-> {
+					getChildren().remove(path);
+					pathClass = new Path(getCellIdByCityId(vehicle.getCurrentCityId()));
+					pathClass.setendingCellId(city.getCellId());
+					path = pathClass.drawPath(fixedList, cityList);
+					getChildren().add(path);
+				});
+				
+			}
 			// Place city
 			int cellID = city.getCellId();
 			label.setLayoutX(getX(cellID));
 			label.setLayoutY(getY(cellID));
+			
 			
 			// Add it to the game (pane)
 			getChildren().add(label);
@@ -127,6 +139,7 @@ public class Game extends Pane {
 		private void placeCities() {
 			for(int i = 0;i<cityList.size();i++)
 				placeCity(cityList.get(i));
+			
 		}
 			
 		// Place fixed cell in the game (pane)
@@ -179,15 +192,15 @@ public class Game extends Pane {
 		}
 			
 		// Get value of Y coordinate that's used in setLayoutY() method
-		private static int getY(int cellID) {
+		public static int getY(int cellID) {
 			int rowID = (cellID - 1) / 10;
 			return (rowID * CELL_SIZE);
 		}
 		
 		// Get value of X coordinate that's used in setLayoutX() method
-		private static int getX(int cellID) {
+		public static int getX(int cellID) {
 			int columnID = (cellID - 1) % 10;
 			return (columnID * CELL_SIZE);
 		}
-			
+		
 }

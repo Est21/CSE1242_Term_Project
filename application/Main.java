@@ -23,7 +23,7 @@ public class Main extends Application {
 		
 		game = new Game("levels/level0.txt"); // center
 		root.setCenter(game);
-		
+
 		bottomPane = new BottomPane(); // bottom
 		root.setBottom(bottomPane);
 		
