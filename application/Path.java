@@ -7,6 +7,8 @@ public class Path {
 	private int startingCellId;
 	private int endingCellId;
 	private Polyline path;
+	private double xPoint;
+	private double yPoint;
 	
 	
 		
@@ -64,7 +66,10 @@ public class Path {
 	
 		double x = startingCitycol;
 		double y= startingCityrow;
+		double incOrDec = 50;
 		
+		//horizontal-true vertical-false
+		boolean verticalOrHorizantal = true;
 		points.add(x);
 		points.add(y);
 	
@@ -74,95 +79,158 @@ public class Path {
 		boolean rightOrLeft= (endingCitycol-startingCitycol) > 0 ? true:false;;
 		
 		System.out.println(endingCityrow);
+		System.out.println(endingCitycol);
 
 		while(true)
 		{
+			
 			//for x axis
-			if(rightOrLeft)
-				while(x < endingCitycol)
+			
+			while(verticalOrHorizantal)
+			{
+				System.out.println(x +" aaa ");
+
+				
+				if(rightOrLeft && incOrDec<0)
 				{
-					x+=50;
-					if(!isTheWayClear(false, rightOrLeft,x, cities, fixeds))
-					{
-						break;
-					}
+					incOrDec*= -1;
 				}
-			else
-				while(x > endingCitycol)
+				else if(!rightOrLeft && incOrDec>0)
 				{
-					x-=50;
-					if(!isTheWayClear(false, rightOrLeft,x,cities, fixeds))
-					{
-						break;
-					}
+					incOrDec*= -1;
 				}
+					
+				
+				if(!isTheWayClearForFixed(verticalOrHorizantal,(incOrDec>0),x,y,fixeds) ||!isTheWayClearForFixed(verticalOrHorizantal,(incOrDec<0),x,y,fixeds))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					x+= incOrDec;
+					break;
+					
+				}
+				else if(x > endingCitycol-20 && (incOrDec>0))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					break;
+						
+				}
+				else if(x < endingCitycol+20 && (incOrDec<0))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					break;
+					
+				}
+				x+= incOrDec;
+					
+			}
+			
 			points.add(x);
-			points.add(y);
+			points.add(y);	
 			
 			//for y axis
-			if(upOrDown)
-				while(y > endingCityrow)
+			while(!verticalOrHorizantal)
+			{
+				System.out.println(y +" bbbb ");
+				if(upOrDown && incOrDec>0)
 				{
-					y-=50;
-					if(!isTheWayClear(true, upOrDown,y,cities, fixeds))
-					{
-						break;
-					}
+					incOrDec*= -1;
 				}
-			else
-				while(y < endingCityrow)
+				else if(!upOrDown && incOrDec<0)
 				{
-					y+=50;
-					if(!isTheWayClear(true, upOrDown,y,cities, fixeds))
-					{
-						break;
-					}
+					incOrDec*= -1;
 				}
+				
+				
+				if(!isTheWayClearForFixed(!verticalOrHorizantal,(incOrDec<0),x,y,fixeds) ||
+						!isTheWayClearForFixed(!verticalOrHorizantal,(incOrDec>0),x,y,fixeds))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					y+= incOrDec;
+					break;
+				}
+				else if(y > endingCityrow-20 && (incOrDec>0))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					break;
+					
+				}
+				else if(y < endingCityrow+20 && (incOrDec<0))
+				{
+					verticalOrHorizantal=!verticalOrHorizantal;
+					break;
+				}
+				y+= incOrDec;
 			
+				
+			}
+			System.out.println(x);
+			System.out.println(y);	
 			points.add(x);
 			points.add(y);
+				
 			
-			if(endingCityrow == y && endingCitycol==x)
+				
+			
+			
+			
+			if((endingCityrow +10 >= y && endingCityrow -10<=y)&& (endingCitycol+10>=x && endingCitycol-10<=x))
 				break;
-		}
+	}
 		return (new Polyline(convertDoubles(points)));
 		
 	}
 	//Change direction
-	//isVertical -> false-horizontal true-vertical
-	private boolean isTheWayClear(boolean isVertical,boolean whichDirection,double coodinate,ArrayList<City> cities,ArrayList<FixedCell> fixeds) {
+	//isVertical -> true-horizontal false-vertical
+	private boolean isTheWayClearForFixed(boolean isVertical,boolean whichDirection,double x,double y,ArrayList<FixedCell> fixeds) {
 		
 		for(int i=0;i<fixeds.size();i++)
 		{
 			if(isVertical)
 			{
+				
+				
 				// +50 is cell size
-				if((Game.getX(fixeds.get(i).getCellId()) <coodinate +75 &&
-						Game.getX(fixeds.get(i).getCellId()) >coodinate -75))
+				if((Game.getX(fixeds.get(i).getCellId()) <=x +26 &&
+						Game.getX(fixeds.get(i).getCellId()) >=x -26) &&
+						(Game.getY(fixeds.get(i).getCellId()) <=y +26 && 
+						Game.getY(fixeds.get(i).getCellId()) >=y-26))
 					return false;
+				
 			}
 			else if(!isVertical)
 			{
 				// +50 is cell size
-				if(Game.getY(fixeds.get(i).getCellId()) <coodinate +75 && 
-						Game.getY(fixeds.get(i).getCellId()) >coodinate -75)
+				// +50 is cell size
+				if((Game.getX(fixeds.get(i).getCellId()) <=x +26 &&
+						Game.getX(fixeds.get(i).getCellId()) >=x -26) &&
+						(Game.getY(fixeds.get(i).getCellId()) <=y +26 && 
+						Game.getY(fixeds.get(i).getCellId()) >=y-26))
 					return false;
+				
 			}
 		}
+		
+		return true;
+	}
+private boolean isTheWayClearForCities(boolean isVertical,boolean whichDirection,double x,double y,ArrayList<City> cities) {
+		
+		
 		for(int j=0;j<cities.size();j++)
 		{
+			if(cities.get(j).getCellId() == endingCellId)
+				continue;
 			if(isVertical)
 			{
 				// +50 is cell size
-				if(Game.getX(cities.get(j).getCellId()) <coodinate +75 ||
-						Game.getX(cities.get(j).getCellId()) >coodinate -75)
+				if(Game.getX(cities.get(j).getCellId()) <x +26 &&
+						Game.getX(cities.get(j).getCellId()) >x -26)
 					return false;
 			}
 			else if(!isVertical)
 			{
 				// +50 is cell size
-				if(Game.getY(cities.get(j).getCellId()) < coodinate +75 ||
-						Game.getY(cities.get(j).getCellId()) >coodinate -75)
+				if(Game.getY(cities.get(j).getCellId()) < y +26 &&
+						Game.getY(cities.get(j).getCellId()) >y -26)
 					return false;
 			}
 		}
